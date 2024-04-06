@@ -1,16 +1,16 @@
 import { create } from "zustand";
-import { v4 as uuid } from "uuid";
-// import { persist } from "zustand/middleware";
+import axios from "axios";
+import { BASE_TASK_URL } from "../constants/tasks";
 
 export type Status =
   | "Pending"
   | "In Progress"
   | "Completed"
   | "Deployed"
-  | "Deffered";
+  | "Deferred";
 
 export type Task = {
-  id: string;
+  _id: string;
   title: string;
   description: string;
   status: Status;
@@ -21,8 +21,16 @@ export type Task = {
   endDate?: Date;
 };
 
+export type User = {
+  googleId: string;
+  displayName: string;
+  email: string;
+  image: string;
+};
+
 export type State = {
   tasks: Task[];
+  user: User | null;
 };
 
 export type Actions = {
@@ -35,17 +43,19 @@ export type Actions = {
   ) => void;
   removeTask: (id: string) => void;
   setTasks: (tasks: Task[]) => void;
-  updateTask: (title: string, status: Status, priority: string) => void;
+  setUser: (user: User | null) => void;
+  updateTask: (id: string, status: Status, priority: string) => void;
 };
 
-export const useTaskStore = create<State & Actions>()((set) => ({
-  tasks: JSON.parse(localStorage.getItem("tasks")!) || [],
-  addTask: (title, description, team, priority, assignee) => {
-    set((state) => ({
-      tasks: [
-        ...state.tasks,
+export const useTaskStore = create<State & Actions>((set) => ({
+  user: null,
+  setUser: (user) => set({ user }),
+  tasks: [],
+  addTask: async (title, description, team, priority, assignee) => {
+    try {
+      const response = await axios.post(
+        `${BASE_TASK_URL}/addTask`,
         {
-          id: uuid(),
           title,
           description,
           team,
@@ -54,30 +64,50 @@ export const useTaskStore = create<State & Actions>()((set) => ({
           status: "Pending",
           startDate: new Date(),
         },
-      ],
-    }));
-  },
-  removeTask: (id) =>
-    set((state) => {
-      const newTasks = state.tasks.filter((task) => {
-        return task.id !== id;
-      })
-      localStorage.setItem("tasks", JSON.stringify(newTasks));
-      return {
-        tasks: newTasks,
-      };
-    }),
-  updateTask: (id: string, status: Status, priority) =>
-    set((state) => {
-      const newTasks = state.tasks.map((task) =>
-        task.id === id
-          ? { ...task, status, priority, endDate: new Date() }
-          : task
+        {
+          withCredentials: true,
+        }
       );
-      localStorage.setItem("tasks", JSON.stringify(newTasks));
-      return {
-        tasks: newTasks,
-      };
-    }),
-  setTasks: (tasks) => set(() => ({ tasks })),
+      set((state) => ({ tasks: [...state.tasks, response.data.task] }));
+    } catch (error) {
+      console.error("Error adding task:", error);
+      // Handle error
+    }
+  },
+  removeTask: async (id) => {
+    try {
+      await axios.delete(`${BASE_TASK_URL}/deleteTask/${id}`, {
+        withCredentials: true,
+      });
+      set((state) => ({
+        tasks: state.tasks.filter((task) => task._id !== id),
+      }));
+    } catch (error) {
+      console.error("Error deleting task:", error);
+      // Handle error
+    }
+  },
+  updateTask: async (id: string, status: Status, priority: string) => {
+    try {
+      const response = await axios.put(
+        `${BASE_TASK_URL}/updateTask/${id}`,
+        {
+          status,
+          priority,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      set((state) => ({
+        tasks: state.tasks.map((task) =>
+          task._id === id ? response.data.task : task
+        ),
+      }));
+    } catch (error) {
+      console.error("Error updating task:", error);
+      // Handle error
+    }
+  },
+  setTasks: (tasks) => set({ tasks }),
 }));

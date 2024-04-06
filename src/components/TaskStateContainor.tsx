@@ -29,14 +29,14 @@ export const TaskStateContainor = ({
           .filter((task) => task.status === status)
           .map((task) => (
             <Task
-              id={task.id}
+              id={task._id}
               team={task.team}
               title={task.title}
               assignPerson={task.assignee}
               description={task.description}
               priority={task.priority}
               status={task.status}
-              key={task.id}
+              key={task._id}
             />
           ))}
       </div>
@@ -105,7 +105,7 @@ export const Task = ({
       <div className="flex">
         <h3 className="text-base flex-1">@{assignPerson}</h3>
         <div className="relative inline-block">
-          <div  
+          <div
             className="p-1 bg-blue-900/60 text-white rounded-md flex justify-center items-center cursor-pointer"
             onClick={toggleDropdown}
           >
@@ -142,15 +142,15 @@ export const Task = ({
         status={status}
       />
       <EditTaskModal
-      title={title}
-      description={description}
-      team={team}
-      assignee={assignPerson}
-      isOpen={isOpenEdit}
-      setIsOpenEdit={setIsOpenEdit}
-      status={status}
-      priority={priority}
-      id={id}
+        title={title}
+        description={description}
+        team={team}
+        assignee={assignPerson}
+        isOpen={isOpenEdit}
+        setIsOpenEdit={setIsOpenEdit}
+        status={status}
+        priority={priority}
+        id={id}
       />
     </div>
   );
