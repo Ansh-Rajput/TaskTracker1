@@ -13,4 +13,4 @@ export const taskStates: TaskState[] = [
   { state: "Deferred", bgColor: "bg-red-500" },
 ];
 
-export const BASE_TASK_URL = `${import.meta.env.VITE_BACKEND_URL}:8000/tasks`;
+export const BASE_TASK_URL = `${import.meta.env.VITE_BACKEND_URL}/tasks`;

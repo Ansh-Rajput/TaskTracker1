@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { IoLogInOutline } from "react-icons/io5";
 import { useTaskStore } from "../store/taskStore";
 
@@ -9,12 +9,12 @@ export const NavBar = () => {
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-  const loginWithGoogle = () => {
-    window.open(`${backendUrl}:8000/auth/google/callback`, "_self");
-  };
+  const loginWithGoogle = useCallback(() => {
+    window.open(`${backendUrl}/auth/google/callback`, "_self");
+  }, [backendUrl]);
 
   const logOut = async () => {
-    await axios.get(`${backendUrl}:8000/logout`, {
+    await axios.get(`${backendUrl}/logout`, {
       withCredentials: true,
     });
 
@@ -24,7 +24,7 @@ export const NavBar = () => {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const response = await axios.get(`${backendUrl}:8000/login/sucess`, {
+        const response = await axios.get(`${backendUrl}/login/sucess`, {
           withCredentials: true,
         });
         setUser(response.data.user);
