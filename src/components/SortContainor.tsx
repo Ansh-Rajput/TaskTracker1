@@ -1,21 +1,15 @@
+import { priorityOrder } from "../constants/tasks";
 import { Task, useTaskStore } from "../store/taskStore";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 
 export const SortContainor = () => {
   const [selectedPriority, setSelectedPriority] = useState("");
   const setTasks = useTaskStore((state) => state.setTasks); // Assuming you have a setTasks function in your store
   const tasks = useTaskStore((state) => state.tasks); // Assuming you have a setTasks function in your store
 
-  const handleChange = (event) => {
+  const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const priority = event.target.value;
     setSelectedPriority(priority);
-
-    const priorityOrder = {
-      "p1": 1,
-      "p2": 2,
-      "p3": 3,
-      "p4": 4,
-    };
 
     if (priority === "priority") {
       const sortedTasks: Task[] = tasks.slice().sort((a: Task, b: Task) => {
@@ -26,17 +20,16 @@ export const SortContainor = () => {
       });
 
       setTasks(sortedTasks);
-    }
-    else if (priority === "date") {
-      const sortedTasks = tasks.slice().sort((a, b) => {
-        return new Date(a.startDate) - new Date(b.startDate);
+    } else if (priority === "date") {
+      const sortedTasks = tasks.slice().sort((a: Task, b: Task) => {
+        return (
+          new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+        );
       });
       setTasks(sortedTasks);
+    } else {
+      setTasks(JSON.parse(localStorage.getItem("tasks") as string));
     }
-    else{
-      setTasks(JSON.parse(localStorage.getItem("tasks") as string))
-    }
-
   };
 
   return (

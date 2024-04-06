@@ -5,6 +5,13 @@ export type TaskState = {
   bgColor: string;
 };
 
+export const priorityOrder = {
+  p1: 1,
+  p2: 2,
+  p3: 3,
+  p4: 4,
+};
+
 export const taskStates: TaskState[] = [
   { state: "Pending", bgColor: "bg-yellow-500" },
   { state: "In Progress", bgColor: "bg-blue-500" },

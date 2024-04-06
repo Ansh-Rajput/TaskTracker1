@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import axios from "axios";
-import { BASE_TASK_URL } from "../constants/tasks";
+import { BASE_TASK_URL, priorityOrder } from "../constants/tasks";
 
 export type Status =
   | "Pending"
@@ -14,7 +14,7 @@ export type Task = {
   title: string;
   description: string;
   status: Status;
-  priority: string;
+  priority: keyof typeof priorityOrder;
   team: string;
   assignee: string;
   startDate: Date;
